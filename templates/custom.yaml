@@ -296,7 +296,7 @@ Resources:
     DependsOn: WebServerInstance
     Properties:
       Handle: !Ref WebServerInstanceWaitHandle
-      Timeout: 900
+      Timeout: '900'
   WebServerInstanceWaitHandle:
     Type: 'AWS::CloudFormation::WaitConditionHandle'     
     #CreationPolicy:
