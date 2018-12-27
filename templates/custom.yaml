@@ -272,6 +272,33 @@ Resources:
         SubnetId:
           Ref: Subnet
         #Userdata we need to signal instance is actually setup...
+      UserData: !Base64
+        'Fn::Join':
+           - ''
+           - - |
+              <script>
+           - 'cfn-init.exe -v -s '
+           - !Ref 'AWS::StackName'
+           - ' -r WebServerInstance'
+           - ' --region '
+           - !Ref 'AWS::Region'
+           - |+
+
+           - 'cfn-signal.exe -e %ERRORLEVEL% '
+           - !Base64 
+             Ref: WebServerInstanceWaitHandle
+           - |+
+
+           - </script>
+
+  WebServerInstanceWaitCondition:
+    Type: 'AWS::CloudFormation::WaitCondition'
+    DependsOn: WebServerInstance
+    Properties:
+      Handle: !Ref WebServerInstanceWaitHandle
+      Timeout: 900
+  WebServerInstanceWaitHandle:
+    Type: 'AWS::CloudFormation::WaitConditionHandle'     
     #CreationPolicy:
       #ResourceSignal:
         #Timeout: PT15M
