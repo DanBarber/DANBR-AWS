@@ -1,0 +1,401 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This AWS CloudFormation Template creates a new VPC and Subnet, and then
+  spins up an EC2 instance with an Elastic IP address attached, along with a security
+  group. **WARNING** This template creates an Amazon EC2 instance. You will be billed
+  for the AWS resources used if you create a stack from this template.
+Parameters:
+  InstanceType:
+    Description: WebServer EC2 instance type
+    Type: String
+    Default: t2.small
+    AllowedValues:
+    - t1.micro
+    - t2.nano
+    - t2.micro
+    - t2.small
+    - t2.medium
+    - t2.large
+    - m1.small
+    - m1.medium
+    - m1.large
+    - m1.xlarge
+    - m2.xlarge
+    - m2.2xlarge
+    - m2.4xlarge
+    - m3.medium
+    - m3.large
+    - m3.xlarge
+    - m3.2xlarge
+    - m4.large
+    - m4.xlarge
+    - m4.2xlarge
+    - m4.4xlarge
+    - m4.10xlarge
+    - c1.medium
+    - c1.xlarge
+    - c3.large
+    - c3.xlarge
+    - c3.2xlarge
+    - c3.4xlarge
+    - c3.8xlarge
+    - c4.large
+    - c4.xlarge
+    - c4.2xlarge
+    - c4.4xlarge
+    - c4.8xlarge
+    - g2.2xlarge
+    - g2.8xlarge
+    - r3.large
+    - r3.xlarge
+    - r3.2xlarge
+    - r3.4xlarge
+    - r3.8xlarge
+    - i2.xlarge
+    - i2.2xlarge
+    - i2.4xlarge
+    - i2.8xlarge
+    - d2.xlarge
+    - d2.2xlarge
+    - d2.4xlarge
+    - d2.8xlarge
+    - hi1.4xlarge
+    - hs1.8xlarge
+    - cr1.8xlarge
+    - cc2.8xlarge
+    - cg1.4xlarge
+    ConstraintDescription: must be a valid EC2 instance type.
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable RDP access to the instance
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+  SSHLocation:
+    Description: " The IP address range that can be used to RDP to the EC2 instances"
+    Type: String
+    MinLength: '9'
+    MaxLength: '18'
+    Default: 0.0.0.0/0
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+Mappings:
+  AWSRegion2AMI:
+    us-east-1:
+      Windows2008r2: ami-0509af5ff9695a433
+      Windows2012r2: ami-0fba87d7f8c8744d4
+    us-west-2:
+      Windows2008r2: ami-0d725250b69cae269
+      Windows2012r2: ami-02e27664434db6def
+    us-west-1:
+      Windows2008r2: ami-0cd391ee2ad7d80b0
+      Windows2012r2: ami-04370c2a300903acc
+    eu-west-1:
+      Windows2008r2: ami-0ffffc9a085b90ffa
+      Windows2012r2: ami-01dbaf1c50a36891d
+    eu-west-2:
+      Windows2008r2: ami-0772b918d115fe008
+      Windows2012r2: ami-0a7551990da17b8d6
+    eu-west-3:
+      Windows2008r2: ami-0956e0f47ca40b5bb
+      Windows2012r2: ami-040ef025ec13d58bf
+    eu-central-1:
+      Windows2008r2: ami-0eb471abeccbcd912
+      Windows2012r2: ami-0d55859ee09a59138
+    ap-northeast-1:
+      Windows2008r2: ami-0e850e62213220c82
+      Windows2012r2: ami-0a45b66bda01c89c8
+    ap-northeast-2:
+      Windows2008r2: ami-00cda273ecf46d99e
+      Windows2012r2: ami-0b3a3970b73d5b63a
+    ap-northeast-3:
+      Windows2008r2: ami-003051ef4ceec8d27
+      Windows2012r2: ami-0b080b2ee57fa5e3d
+    ap-southeast-1:
+      Windows2008r2: ami-07d277db8f3dcbb5b
+      Windows2012r2: ami-0bf96f139bff648cc
+    ap-southeast-2:
+      Windows2008r2: ami-01d0a8d5f9671d888
+      Windows2012r2: ami-0664c039c4dea5193
+    ap-south-1:
+      Windows2008r2: ami-0131b74fc8bfa2b67
+      Windows2012r2: ami-0bd1dc65d74266ee2
+    us-east-2:
+      Windows2008r2: ami-0935776807b87a59e
+      Windows2012r2: ami-0679e5ac84d15f15e
+    ca-central-1:
+      Windows2008r2: ami-07f0454772df58f58
+      Windows2012r2: ami-0a27bbef221046aae
+    sa-east-1:
+      Windows2008r2: ami-07ddb1a3b50d0e91f
+      Windows2012r2: ami-01d74c2e93478e2f5
+    cn-north-1:
+      Windows2008r2: ami-014020ef82f20dc97
+      Windows2012r2: ami-0aefdd3cc86bdb17d
+    cn-northwest-1:
+      Windows2008r2: ami-08a83481445dcf342
+      Windows2012r2: ami-08922e8cdfa19cd6e
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+    Metadata:
+      AWS::CloudFormation::Designer:
+        id: 922722ec-6547-4a27-9bfd-244853ce6fb1
+  Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock: 10.0.0.0/24
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+    Metadata:
+      AWS::CloudFormation::Designer:
+        id: 6ee4315d-b0bc-4713-85a1-930472b7cf5a
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+    Metadata:
+      AWS::CloudFormation::Designer:
+        id: 82e99772-ce6c-4dc3-a707-3b78e98c0c52
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: VPC
+      InternetGatewayId:
+        Ref: InternetGateway
+    Metadata:
+      AWS::CloudFormation::Designer:
+        id: 36ae9084-010c-4836-b29d-ca26315b075f
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: VPC
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+    Metadata:
+      AWS::CloudFormation::Designer:
+        id: 63b660d1-8481-4350-9a22-23a522d19499
+  Route:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId:
+        Ref: RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: InternetGateway
+    Metadata:
+      AWS::CloudFormation::Designer:
+        id: e894df0e-a7fa-49ee-8181-379412c06ec6
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: Subnet
+      RouteTableId:
+        Ref: RouteTable
+    Metadata:
+      AWS::CloudFormation::Designer:
+        id: 0410541b-c98b-4430-b20d-bad008bcd3ae
+  IPAddress:
+    Type: AWS::EC2::EIP
+    DependsOn: AttachGateway
+    Properties:
+      Domain: vpc
+      InstanceId:
+        Ref: WebServerInstance
+    Metadata:
+      AWS::CloudFormation::Designer:
+        id: ad70b86c-c6fd-471a-a37f-022639899969
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId:
+        Ref: VPC
+      GroupDescription: Enable rdp access via port 3389
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '3389'
+        ToPort: '3389'
+        CidrIp:
+          Ref: SSHLocation
+      - IpProtocol: tcp
+        FromPort: '80'
+        ToPort: '80'
+        CidrIp: 0.0.0.0/0
+    Metadata:
+      AWS::CloudFormation::Designer:
+        id: 784f8f2c-b06a-44a3-aef9-bed6a441aa2a
+  WebServerInstance:
+    Type: AWS::EC2::Instance
+    DependsOn: AttachGateway
+    Metadata:
+      Comment: Install a simple application
+      
+      AWS::CloudFormation::Designer:
+        id: 5896cc0f-e3c4-476b-a640-fdc7cbb12fc8
+    Properties:
+      ImageId:
+        Fn::FindInMap:
+        - AWSRegion2AMI
+        - Ref: AWS::Region
+        - Windows2008r2
+      InstanceType:
+        Ref: InstanceType
+      KeyName:
+        Ref: KeyName
+      Tags:
+      - Key: Application
+        Value:
+          Ref: AWS::StackId
+      NetworkInterfaces:
+      - GroupSet:
+        - Ref: InstanceSecurityGroup
+        AssociatePublicIpAddress: 'true'
+        DeviceIndex: '0'
+        DeleteOnTermination: 'true'
+        SubnetId:
+          Ref: Subnet
+        #Userdata we need to signal instance is actually setup...
+    #CreationPolicy:
+      #ResourceSignal:
+        #Timeout: PT15M
+#Outputs:
+  #URL:
+    #Value:
+      #Fn::Join:
+      #- ''
+      #- - http://
+        #- Fn::GetAtt:
+          #- WebServerInstance
+          #- PublicIp
+    #Description: Newly created application URL
+Metadata:
+  AWS::CloudFormation::Designer:
+    82e99772-ce6c-4dc3-a707-3b78e98c0c52:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 550
+        y: 290
+      z: 1
+      embeds: []
+    922722ec-6547-4a27-9bfd-244853ce6fb1:
+      size:
+        width: 460
+        height: 570
+      position:
+        x: 60
+        y: 180
+      z: 1
+      embeds:
+      - 784f8f2c-b06a-44a3-aef9-bed6a441aa2a
+      - 63b660d1-8481-4350-9a22-23a522d19499
+      - 6ee4315d-b0bc-4713-85a1-930472b7cf5a
+    784f8f2c-b06a-44a3-aef9-bed6a441aa2a:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 420
+        y: 200
+      z: 2
+      parent: 922722ec-6547-4a27-9bfd-244853ce6fb1
+      embeds: []
+      iscontainedinside:
+      - 922722ec-6547-4a27-9bfd-244853ce6fb1
+    63b660d1-8481-4350-9a22-23a522d19499:
+      size:
+        width: 240
+        height: 240
+      position:
+        x: 100
+        y: 480
+      z: 2
+      parent: 922722ec-6547-4a27-9bfd-244853ce6fb1
+      embeds:
+      - e894df0e-a7fa-49ee-8181-379412c06ec6
+      iscontainedinside:
+      - 922722ec-6547-4a27-9bfd-244853ce6fb1
+    36ae9084-010c-4836-b29d-ca26315b075f:
+      source:
+        id: 922722ec-6547-4a27-9bfd-244853ce6fb1
+      target:
+        id: 82e99772-ce6c-4dc3-a707-3b78e98c0c52
+    e894df0e-a7fa-49ee-8181-379412c06ec6:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 130
+        y: 540
+      z: 3
+      parent: 63b660d1-8481-4350-9a22-23a522d19499
+      embeds: []
+      isassociatedwith:
+      - 82e99772-ce6c-4dc3-a707-3b78e98c0c52
+      iscontainedinside:
+      - 63b660d1-8481-4350-9a22-23a522d19499
+      dependson:
+      - 36ae9084-010c-4836-b29d-ca26315b075f
+    6ee4315d-b0bc-4713-85a1-930472b7cf5a:
+      size:
+        width: 240
+        height: 240
+      position:
+        x: 100
+        y: 210
+      z: 2
+      parent: 922722ec-6547-4a27-9bfd-244853ce6fb1
+      embeds:
+      - 5896cc0f-e3c4-476b-a640-fdc7cbb12fc8
+      iscontainedinside:
+      - 922722ec-6547-4a27-9bfd-244853ce6fb1
+    5896cc0f-e3c4-476b-a640-fdc7cbb12fc8:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 130
+        y: 270
+      z: 3
+      parent: 6ee4315d-b0bc-4713-85a1-930472b7cf5a
+      embeds: []
+      iscontainedinside:
+      - 6ee4315d-b0bc-4713-85a1-930472b7cf5a
+      dependson:
+      - 36ae9084-010c-4836-b29d-ca26315b075f
+    ad70b86c-c6fd-471a-a37f-022639899969:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 560
+        y: 430
+      z: 1
+      embeds: []
+      isassociatedwith:
+      - 5896cc0f-e3c4-476b-a640-fdc7cbb12fc8
+      dependson:
+      - 36ae9084-010c-4836-b29d-ca26315b075f
+    0410541b-c98b-4430-b20d-bad008bcd3ae:
+      source:
+        id: 63b660d1-8481-4350-9a22-23a522d19499
+      target:
+        id: 6ee4315d-b0bc-4713-85a1-930472b7cf5a
