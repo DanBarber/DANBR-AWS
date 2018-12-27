@@ -267,7 +267,7 @@ Resources:
       - GroupSet:
         - Ref: InstanceSecurityGroup
         AssociatePublicIpAddress: true
-        DeviceIndex: 0
+        DeviceIndex: '0'
         DeleteOnTermination: true
         SubnetId:
           Ref: Subnet
