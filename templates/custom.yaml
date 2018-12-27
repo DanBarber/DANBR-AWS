@@ -230,13 +230,13 @@ Resources:
       GroupDescription: Enable rdp access via port 3389
       SecurityGroupIngress:
       - IpProtocol: tcp
-        FromPort: '3389'
-        ToPort: '3389'
+        FromPort: 3389
+        ToPort: 3389
         CidrIp:
           Ref: SSHLocation
       - IpProtocol: tcp
-        FromPort: '80'
-        ToPort: '80'
+        FromPort: 80
+        ToPort: 80
         CidrIp: 0.0.0.0/0
     Metadata:
       AWS::CloudFormation::Designer:
@@ -266,9 +266,9 @@ Resources:
       NetworkInterfaces:
       - GroupSet:
         - Ref: InstanceSecurityGroup
-        AssociatePublicIpAddress: 'true'
-        DeviceIndex: '0'
-        DeleteOnTermination: 'true'
+        AssociatePublicIpAddress: true
+        DeviceIndex: 0
+        DeleteOnTermination: true
         SubnetId:
           Ref: Subnet
         #Userdata we need to signal instance is actually setup...
