@@ -82,51 +82,66 @@ Mappings:
     us-east-1:
       Windows2008r2: ami-0509af5ff9695a433
       Windows2012r2: ami-0fba87d7f8c8744d4
+      Windows2016: ami-041114ddee4a98333
     us-west-2:
       Windows2008r2: ami-0d725250b69cae269
       Windows2012r2: ami-02e27664434db6def
+      Windows2016: ami-019e99815e07ceb49 
     us-west-1:
       Windows2008r2: ami-0cd391ee2ad7d80b0
       Windows2012r2: ami-04370c2a300903acc
+      Windows2016: ami-01238fbae24a14ace
     eu-west-1:
       Windows2008r2: ami-0ffffc9a085b90ffa
       Windows2012r2: ami-01dbaf1c50a36891d
+      Windows2016: ami-0dad95819a9372f76
     eu-west-2:
       Windows2008r2: ami-0772b918d115fe008
       Windows2012r2: ami-0a7551990da17b8d6
+      Windows2016: ami-06a27ce600d784c71
     eu-west-3:
       Windows2008r2: ami-0956e0f47ca40b5bb
       Windows2012r2: ami-040ef025ec13d58bf
+      Windows2016: ami-0a729892011f4185b
     eu-central-1:
       Windows2008r2: ami-0eb471abeccbcd912
       Windows2012r2: ami-0d55859ee09a59138
+      Windows2016: ami-014b173b0f52c004e
     ap-northeast-1:
       Windows2008r2: ami-0e850e62213220c82
       Windows2012r2: ami-0a45b66bda01c89c8
+      Windows2016: ami-0f57a86f53aa1c4ea
     ap-northeast-2:
       Windows2008r2: ami-00cda273ecf46d99e
       Windows2012r2: ami-0b3a3970b73d5b63a
+      Windows2016: ami-05ec63f885e1c6f2a
     ap-northeast-3:
       Windows2008r2: ami-003051ef4ceec8d27
       Windows2012r2: ami-0b080b2ee57fa5e3d
     ap-southeast-1:
       Windows2008r2: ami-07d277db8f3dcbb5b
       Windows2012r2: ami-0bf96f139bff648cc
+      Windows2016: ami-04385f3f533c85af7
     ap-southeast-2:
       Windows2008r2: ami-01d0a8d5f9671d888
       Windows2012r2: ami-0664c039c4dea5193
+      Windows2016: ami-02e3986f071e14a71
     ap-south-1:
       Windows2008r2: ami-0131b74fc8bfa2b67
       Windows2012r2: ami-0bd1dc65d74266ee2
+      Windows2016: ami-07e6b11175e3fa715
     us-east-2:
       Windows2008r2: ami-0935776807b87a59e
       Windows2012r2: ami-0679e5ac84d15f15e
+      Windows2016: ami-0170ffc1abff2ebdc
     ca-central-1:
       Windows2008r2: ami-07f0454772df58f58
       Windows2012r2: ami-0a27bbef221046aae
+      Windows2016: ami-0ee0c966a33759216
     sa-east-1:
       Windows2008r2: ami-07ddb1a3b50d0e91f
       Windows2012r2: ami-01d74c2e93478e2f5
+      Windows2016: ami-0d44cef69e0b580f4
     cn-north-1:
       Windows2008r2: ami-014020ef82f20dc97
       Windows2012r2: ami-0aefdd3cc86bdb17d
@@ -241,7 +256,7 @@ Resources:
       ImageId: !FindInMap 
         - AWSRegion2AMI
         - !Ref 'AWS::Region'
-        - Windows2008r2
+        - Windows2016
       UserData: !Base64 
         'Fn::Join':
           - ''
