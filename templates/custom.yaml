@@ -234,6 +234,11 @@ Resources:
         - AWSRegion2AMI
         - !Ref 'AWS::Region'
         - Windows2016
+      BlockDeviceMappings:
+      - DeviceName: "/dev/sda1"
+          Ebs:
+              VolumeSize: 250
+              VolumeType: "gp2"
       UserData: !Base64 
         'Fn::Join':
           - ''
